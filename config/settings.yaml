@@ -1,0 +1,22 @@
+mlflow:
+  tracking_uri: "http://127.0.0.1:5000"
+  experiment_name: "mnist-experiment"
+
+data:
+  path: "./data"
+  val_split: 0.1        # fraction of training set used for validation
+  random_seed: 42
+
+model:
+  type: "cnn"
+  input_channels: 1
+  num_classes: 10
+  artifact_path: "model"   # subfolder name inside MLflow run artifacts
+
+training:
+  epochs: 5
+  batch_size: 64
+  learning_rate: 0.001
+
+gradcam:
+  target_layer: "conv2"   # name of the layer to hook for Grad-CAM

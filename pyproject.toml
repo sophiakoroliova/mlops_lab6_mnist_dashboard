@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "mlops-lab-6"
+version = "0.1.0"
+description = "MLOps Lab 6 - Streamlit MNIST Dashboard"
+authors = ["sophiakoroliova <89981226+sophiakoroliova@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+streamlit = "^1.35.0"
+mlflow = "^2.13.0"
+torch = "^2.3.0"
+torchvision = "^0.18.0"
+matplotlib = "^3.9.0"
+plotly = "^5.22.0"
+scikit-learn = "^1.5.0"
+numpy = "^1.26.0"
+pillow = "^10.3.0"
+pyyaml = "^6.0.1"
+grad-cam = "^1.5.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.0"
+ruff = "^0.4.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
