@@ -115,7 +115,7 @@ def render(train_ds, val_ds, test_ds) -> None:
 
     logger.info("Displaying sample idx=%d label=%d from %s", sample_idx, label, selected_split)
 
-    col_img, col_meta = st.columns([1, 1])
+    col_img, col_meta = st.columns([1, 2])
 
     with col_img:
         st.pyplot(plot_mnist_image(image_np, title=""), use_container_width=True)
