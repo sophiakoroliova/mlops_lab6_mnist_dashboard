@@ -149,9 +149,9 @@ def render(client, cfg, test_ds, selected_run: Optional[RunSummary]) -> None:
     page = st.number_input("Page", min_value=1, max_value=total_pages, value=1, step=1) - 1
     page_records = error_records[page * page_size: (page + 1) * page_size]
 
-    cols = st.columns(4)
+    cols = st.columns(6)
     for i, record in enumerate(page_records):
-        with cols[i % 4]:
+        with cols[i % 6]:
             img_np = tensor_to_numpy(record["img"])
             st.pyplot(
                 plot_mnist_image(
