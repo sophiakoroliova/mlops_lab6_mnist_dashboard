@@ -96,11 +96,18 @@ def render(client, cfg, train_ds, val_ds, test_ds, selected_run: Optional[RunSum
 
     if source == "Dataset sample":
         ds_map = {"Train": train_ds, "Validation": val_ds, "Test": test_ds}
-        col_split, col_idx = st.columns([1, 3])
+        col_split, col_idx = st.columns([1, 1])
         with col_split:
             split = st.selectbox("Split", list(ds_map.keys()), key="expl_split")
         with col_idx:
-            idx = st.slider("Sample index", 0, len(ds_map[split]) - 1, 0, key="expl_idx")
+            idx = st.number_input(
+                "Sample index",
+                min_value=0,
+                max_value=len(ds_map[split]) - 1,
+                value=0,
+                step=1,
+                key="expl_idx",
+            )
 
         image_tensor, true_label = get_sample(ds_map[split], idx)
         image_np = tensor_to_numpy(image_tensor)

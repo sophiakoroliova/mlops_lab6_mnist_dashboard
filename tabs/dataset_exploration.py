@@ -60,53 +60,90 @@ def render(train_ds, val_ds, test_ds) -> None:
 
     st.divider()
 
-    # ── Sample inspection ────────────────────────────────────────────────────
+    # ── Sample inspection ─────────────────────────────────────────────────────
     st.subheader("Sample inspection")
 
-    col_split, col_filter, col_idx = st.columns([1, 1, 2])
+    # All controls in one row
+    col_split, col_class, col_idx = st.columns([2, 2, 3])
 
     with col_split:
-        selected_split = st.selectbox("Split", ["Train", "Validation", "Test"], key="insp_split")
+        selected_split = st.selectbox(
+            "Split",
+            ["Train", "Validation", "Test"],
+            key="insp_split",
+        )
 
     active_ds = ds_map[selected_split]
 
-    with col_filter:
+    with col_class:
         filter_class = st.selectbox(
             "Filter by class",
             ["All"] + CLASS_NAMES,
             key="insp_class",
         )
 
-    if filter_class == "All":
-        max_idx = len(active_ds) - 1
-        with col_idx:
-            sample_idx = st.slider("Sample index", 0, max_idx, 0, key="insp_idx")
-    else:
-        class_idx = int(filter_class)
-        valid_indices = get_samples_by_class(active_ds, class_idx)
-        if not valid_indices:
-            st.warning(f"No samples found for class {filter_class} in {selected_split}.")
-            return
-        with col_idx:
-            position = st.slider(
-                f"Sample (class {filter_class})",
-                0, len(valid_indices) - 1, 0,
+    with col_idx:
+        if filter_class == "All":
+            max_idx = len(active_ds) - 1
+            sample_idx = st.number_input(
+                "Sample index",
+                min_value=0,
+                max_value=max_idx,
+                value=0,
+                step=1,
+                key="insp_idx",
+            )
+        else:
+            valid_indices = get_samples_by_class(active_ds, int(filter_class))
+            if not valid_indices:
+                st.warning(f"No samples found for class {filter_class} in {selected_split}.")
+                return
+            max_pos = len(valid_indices) - 1
+            position = st.number_input(
+                f"Sample index (class {filter_class})",
+                min_value=0,
+                max_value=max_pos,
+                value=0,
+                step=1,
                 key="insp_pos",
             )
-        sample_idx = valid_indices[position]
+            sample_idx = valid_indices[int(position)]
 
-    image_tensor, label = get_sample(active_ds, sample_idx)
+    # ── Image + metadata side by side ─────────────────────────────────────────
+    image_tensor, label = get_sample(active_ds, int(sample_idx))
     image_np = tensor_to_numpy(image_tensor)
 
     logger.info("Displaying sample idx=%d label=%d from %s", sample_idx, label, selected_split)
 
-    col_img, col_meta = st.columns([1, 2])
+    col_img, col_meta = st.columns([1, 1])
+
     with col_img:
-        st.pyplot(plot_mnist_image(image_np, title=f"Digit: {label}"), use_container_width=False)
+        st.pyplot(plot_mnist_image(image_np, title=""), use_container_width=True)
+
     with col_meta:
-        st.markdown(f"**Split:** {selected_split}")
-        st.markdown(f"**Index in split:** {sample_idx}")
-        st.markdown(f"**True label:** `{label}` → digit **{CLASS_NAMES[label]}**")
-        st.markdown(f"**Image shape:** {image_np.shape}")
-        st.markdown(f"**Pixel range:** [{image_np.min()}, {image_np.max()}]")
+        st.markdown("<br><br>", unsafe_allow_html=True)
+
+        st.markdown(
+            f"""
+                <div style="background-color:#cce5ff; padding:12px 18px; border-radius:6px;
+                            color:#003d7a; font-weight:700; font-size:18px; margin-bottom:12px;">
+                    True label: {label}
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f"""
+                <div style="background-color:#f0f2f6; padding:12px 18px; border-radius:6px;
+                            font-size:15px; line-height:2;">
+                    <b>Shape:</b> {image_np.shape[0]} × {image_np.shape[1]} px<br>
+                    <b>Channels:</b> 1 (grayscale)<br>
+                    <b>Pixel min:</b> {int(image_np.min())}<br>
+                    <b>Pixel max:</b> {int(image_np.max())}<br>
+                    <b>Intensity range:</b> [{int(image_np.min())}, {int(image_np.max())}]
+                </div>
+                """,
+            unsafe_allow_html=True,
+        )
 
